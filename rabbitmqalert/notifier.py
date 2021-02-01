@@ -1,5 +1,6 @@
 import smtplib
 import urllib2
+import pymsteams
 
 
 class Notifier():
@@ -49,3 +50,12 @@ class Notifier():
             request = urllib2.Request(telegram_url)
             response = urllib2.urlopen(request)
             response.close()
+
+        if self.arguments["teams_webhook"]:
+            self.log.info("Sending teams notification: \"{0}\"".format(body))
+
+            teams_payload = "%s: %s" % (self.arguments["server_queue"], text)
+
+            my_teams_message = pymsteams.connectorcard(self.arguments["teams_webhook"])
+            my_teams_message.text(teams_payload)
+            my_teams_message.send()

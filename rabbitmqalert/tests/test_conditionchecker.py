@@ -249,7 +249,8 @@ class ConditionCheckerTestCase(unittest.TestCase):
             "slack_channel": "channel",
             "slack_username": "username",
             "telegram_bot_id": "foo_bot",
-            "telegram_channel": "foo_channel"
+            "telegram_channel": "foo_channel",
+            "teams_webhook": "http://foo.com/webhook"
         }
 
         return arguments

@@ -28,6 +28,7 @@ Currently the following are supported:
 -  E-mails
 -  Slack messages
 -  Telegram messages
+-  Microsoft teams webhook
 
 Installation
 ============

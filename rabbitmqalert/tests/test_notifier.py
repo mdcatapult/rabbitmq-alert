@@ -54,6 +54,7 @@ class NotifierTestCase(unittest.TestCase):
 
         notifier.smtplib = mock.MagicMock()
         notifier.urllib2 = mock.MagicMock()
+        notifier.pymsteams = mock.MagicMock()
         notifier_object.send_notification("")
 
         notifier.smtplib.SMTP().login.assert_called_once()
@@ -66,6 +67,7 @@ class NotifierTestCase(unittest.TestCase):
 
         notifier.smtplib = mock.MagicMock()
         notifier.urllib2 = mock.MagicMock()
+        notifier.pymsteams = mock.MagicMock()
         notifier_object.send_notification("")
 
         notifier.smtplib.SMTP().login.assert_not_called()
@@ -100,7 +102,7 @@ class NotifierTestCase(unittest.TestCase):
 
         notifier.smtplib.SMTP_SSL().sendmail.assert_not_called()
 
-    def test_send_notification_sends_to_slack_and_telegram_when_arguments_are_set(self):
+    def test_send_notification_sends_to_slack_and_telegram_and_teams_when_arguments_are_set(self):
         logger = mock.MagicMock()
         client = mock.MagicMock()
 
@@ -108,9 +110,11 @@ class NotifierTestCase(unittest.TestCase):
 
         notifier.smtplib = mock.MagicMock()
         notifier.urllib2 = mock.MagicMock()
+        notifier.pymsteams = mock.MagicMock()
         notifier_object.send_notification("")
 
         self.assertEquals(2, notifier.urllib2.urlopen.call_count)
+        self.assertEquals(1, notifier.pymsteams.connectorcard.call_count)
 
     def test_send_notification_does_not_send_to_slack_when_any_argument_not_set(self):
         logger = mock.MagicMock()
@@ -143,6 +147,23 @@ class NotifierTestCase(unittest.TestCase):
 
         # only slack is called
         notifier.urllib2.urlopen.assert_called_once()
+
+    def test_send_notification_does_not_send_to_teams_when_any_argument_not_set(self):
+        logger = mock.MagicMock()
+        client = mock.MagicMock()
+
+        arguments = self.construct_arguments()
+        arguments["teams_webhook"] = None
+
+        notifier_object = notifier.Notifier(logger, arguments)
+
+        notifier.smtplib = mock.MagicMock()
+        notifier.urllib2 = mock.MagicMock()
+        notifier.pymsteams = mock.MagicMock()
+        notifier_object.send_notification("")
+
+        # only telegram is called
+        notifier.pymsteams.connectorcard.assert_not_called()
 
     def test_send_notification_uses_host_alias_when_set(self):
         logger = mock.MagicMock()
@@ -181,6 +202,7 @@ class NotifierTestCase(unittest.TestCase):
         arguments = self.construct_arguments()
         arguments["slack_url"] = None
         arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -198,6 +220,7 @@ class NotifierTestCase(unittest.TestCase):
         arguments["email_to"] = None
         arguments["slack_url"] = None
         arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -214,6 +237,7 @@ class NotifierTestCase(unittest.TestCase):
         arguments = self.construct_arguments()
         arguments["email_to"] = None
         arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -231,6 +255,7 @@ class NotifierTestCase(unittest.TestCase):
         arguments["email_to"] = None
         arguments["slack_url"] = None
         arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -247,6 +272,7 @@ class NotifierTestCase(unittest.TestCase):
         arguments = self.construct_arguments()
         arguments["email_to"] = None
         arguments["slack_url"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -264,6 +290,42 @@ class NotifierTestCase(unittest.TestCase):
         arguments["email_to"] = None
         arguments["slack_url"] = None
         arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
+
+        notifier_object = notifier.Notifier(logger, arguments)
+
+        notifier.smtplib = mock.MagicMock()
+        notifier.urllib2 = mock.MagicMock()
+        notifier_object.send_notification("")
+
+        logger.info.assert_not_called()
+
+    def test_send_notification_logs_info_when_sending_to_teams(self):
+        logger = mock.MagicMock()
+        client = mock.MagicMock()
+
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
+
+        notifier_object = notifier.Notifier(logger, arguments)
+
+        notifier.smtplib = mock.MagicMock()
+        notifier.urllib2 = mock.MagicMock()
+        notifier_object.send_notification("")
+
+        logger.info.assert_called_once()
+
+    def test_send_notification_does_not_log_info_when_not_sending_to_teams(self):
+        logger = mock.MagicMock()
+        client = mock.MagicMock()
+
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
+        arguments["teams_webhook"] = None
 
         notifier_object = notifier.Notifier(logger, arguments)
 
@@ -310,7 +372,8 @@ class NotifierTestCase(unittest.TestCase):
             "slack_channel": "channel",
             "slack_username": "username",
             "telegram_bot_id": "foo_bot",
-            "telegram_channel": "foo_channel"
+            "telegram_channel": "foo_channel",
+            "teams_webhook": "http://foo.com/webhook"
         }
 
         return arguments

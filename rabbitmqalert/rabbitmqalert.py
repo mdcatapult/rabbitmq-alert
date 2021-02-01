@@ -56,6 +56,9 @@ def setup_arguments():
     telegram.add_argument("--telegram-bot-id", dest="telegram_bot_id", help="Telegram bot id", type=str)
     telegram.add_argument("--telegram-channel", dest="telegram_channel", help="Telegram channel", type=str)
 
+    teams = parser.add_argument_group("Teams")
+    teams.add_argument("--teams-webhook", dest="teams_webhook", help="Teams webhook URL for MS teams notifications", type=str)
+
     return parser
 
 

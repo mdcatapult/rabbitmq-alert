@@ -367,7 +367,8 @@ class ArgumentsParserTestCase(unittest.TestCase):
             "--slack-channel": "foo-slack-channel",
             "--slack-username": "foo-slack-username",
             "--telegram-bot-id": "foo-telegram-bot-id",
-            "--telegram-channel": "foo-telegram-channel"
+            "--telegram-channel": "foo-telegram-channel",
+            "--teams-webhook": "http://foo.com/webhook"
         }
 
     @staticmethod
